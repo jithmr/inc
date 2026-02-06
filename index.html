@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Calculator (A-K)</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+            padding: 25px;
+        }
+        h2 { text-align: center; color: #333; margin-top: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; vertical-align: middle; }
+        th { background-color: #0056b3; color: white; }
+        
+        /* Badges for A, B, C... */
+        .badge {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: #e9ecef;
+            color: #495057;
+            text-align: center;
+            line-height: 24px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 8px;
+            font-size: 0.9em;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box; /* Ensures padding doesn't break width */
+        }
+        input:focus { border-color: #0056b3; outline: none; }
+
+        /* Read Only Styling */
+        input:read-only {
+            background-color: #f8f9fa;
+            border-color: #e9ecef;
+            color: #495057;
+            font-weight: 500;
+            cursor: default;
+        }
+
+        /* Result Rows */
+        .result-row td { background-color: #e8f5e9; }
+        .result-row input {
+            background-color: #c8e6c9;
+            border-color: #81c784;
+            color: #1b5e20;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .hint { font-size: 0.8em; color: #6c757d; margin-left: 36px; display: block; margin-top: 2px;}
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Salary Increment Calculator</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 55%;">Column Name</th>
+                <th style="width: 45%;">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="badge">A</span> Fixed pay old</td>
+                <td><input type="number" id="A" oninput="calculate()"></td>
+            </tr>
+            <tr>
+                <td><span class="badge">B</span> Fixed pay new</td>
+                <td><input type="number" id="B" oninput="calculate()"></td>
+            </tr>
+            <tr>
+                <td><span class="badge">C</span> PF old</td>
+                <td><input type="number" id="C" oninput="calculate()"></td>
+            </tr>
+            <tr>
+                <td><span class="badge">D</span> PF new</td>
+                <td><input type="number" id="D" oninput="calculate()"></td>
+            </tr>
+            <tr>
+                <td><span class="badge">E</span> Base pay old</td>
+                <td><input type="number" id="E" oninput="calculate()"></td>
+            </tr>
+            <tr>
+                <td><span class="badge">F</span> Base pay new</td>
+                <td><input type="number" id="F" oninput="calculate()"></td>
+            </tr>
+            <tr>
+                <td><span class="badge">G</span> VPF %</td>
+                <td><input type="number" id="G" oninput="calculate()"></td>
+            </tr>
+
+            <tr>
+                <td>
+                    <span class="badge">H</span> VPF old
+                    <span class="hint">Formula: E × G ÷ 100</span>
+                </td>
+                <td><input type="number" id="H" readonly></td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="badge">I</span> VPF new
+                    <span class="hint">Formula: F × G ÷ 100</span>
+                </td>
+                <td><input type="number" id="I" readonly></td>
+            </tr>
+
+            <tr class="result-row">
+                <td>
+                    <span class="badge">J</span> Increment
+                    <span class="hint">Formula: B - A - D + C - I + H</span>
+                </td>
+                <td><input type="number" id="J" readonly></td>
+            </tr>
+            <tr class="result-row">
+                <td>
+                    <span class="badge">K</span> MONTHLY INCREMENT
+                    <span class="hint">Formula: J ÷ 12</span>
+                </td>
+                <td><input type="number" id="K" readonly></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function calculate() {
+        // 1. Get Values (default to 0 if empty)
+        const val = (id) => parseFloat(document.getElementById(id).value) || 0;
+
+        let A = val('A');
+        let B = val('B');
+        let C = val('C');
+        let D = val('D');
+        let E = val('E');
+        let F = val('F');
+        let G = val('G');
+
+        // 2. Calculate VPF Old (H)
+        let H = (E * G) / 100;
+        document.getElementById('H').value = H.toFixed(2);
+
+        // 3. Calculate VPF New (I)
+        let I = (F * G) / 100;
+        document.getElementById('I').value = I.toFixed(2);
+
+        // 4. Calculate Increment (J)
+        // Formula: B - A - D + C - I + H
+        let J = B - A - D + C - I + H;
+        document.getElementById('J').value = J.toFixed(2);
+
+        // 5. Calculate Monthly Increment (K)
+        // Formula: J / 12
+        let K = J / 12;
+        document.getElementById('K').value = K.toFixed(2);
+    }
+</script>
+
+</body>
+</html>
